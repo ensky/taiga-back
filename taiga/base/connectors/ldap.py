@@ -32,3 +32,4 @@ def login (username: str, password: str) -> tuple:
 	email = username + getattr(settings, "LDAP_BASE_EMAIL", None).format(username=username)
 	full_name = username
 	return (email, full_name)
+

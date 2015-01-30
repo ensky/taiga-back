@@ -28,3 +28,4 @@ class GitHubApiError(ConnectorBaseException):
 
 class LDAPLoginError(ConnectorBaseException):
 	pass
+
