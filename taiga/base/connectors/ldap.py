@@ -25,14 +25,15 @@ DN_FORMAT = getattr(settings, "LDAP_DN_FORMAT", "")
 BASE_EMAIL = getattr(settings, "LDAP_BASE_EMAIL", "")
 
 def login (username: str, password: str) -> tuple:
-	dn = DN_FORMAT.format(username=username)
-	try:
-		server = Server(SERVER)
-		conn = Connection(server, auto_bind = True, client_strategy = STRATEGY_SYNC, user=dn, password=password, authentication=AUTH_SIMPLE, check_names=True)
-	except:
-		raise exc.LDAPLoginError({"error_message": "LDAP account or password incorrect."})
+    dn = DN_FORMAT.format(username=username)
+    try:
+        server = Server(SERVER)
+        conn = Connection(server, auto_bind = True, client_strategy = STRATEGY_SYNC, user=dn, password=password, authentication=AUTH_SIMPLE, check_names=True)
+    except:
+        raise exc.LDAPLoginError({"error_message": "LDAP account or password incorrect."})
 
-	email = username + BASE_EMAIL
-	full_name = username
-	return (email, full_name)
+    # TODO: fetch email and fullname information from LDAP server
+    email = username + BASE_EMAIL
+    full_name = username
+    return (email, full_name)
 
