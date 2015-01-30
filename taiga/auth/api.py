@@ -28,6 +28,7 @@ from taiga.base.api import viewsets
 from taiga.base.decorators import list_route
 from taiga.base import exceptions as exc
 from taiga.base.connectors import github
+from taiga.base.connectors import ldap
 from taiga.users.services import get_and_validate_user
 
 from .serializers import PublicRegisterSerializer
@@ -38,6 +39,7 @@ from .services import private_register_for_existing_user
 from .services import private_register_for_new_user
 from .services import public_register
 from .services import github_register
+from .services import ldap_register
 from .services import make_auth_response_data
 
 from .permissions import AuthPermission
@@ -158,6 +160,15 @@ class AuthViewSet(viewsets.ViewSet):
         data = make_auth_response_data(user)
         return Response(data, status=status.HTTP_200_OK)
 
+    def _ldap_login(self, request):
+        username = request.DATA.get('username', None)
+        password = request.DATA.get('password', None)
+
+        email, full_name = ldap.login(username=username, password=password)
+        user = ldap_register(username=username, email=email, full_name=full_name)
+        data = make_auth_response_data(user)
+        return Response(data, status=status.HTTP_200_OK)
+
     # Login view: /api/v1/auth
     def create(self, request, **kwargs):
         self.check_permissions(request, 'create', None)
@@ -167,4 +178,6 @@ class AuthViewSet(viewsets.ViewSet):
             return self._login(request)
         elif type == "github":
             return self._github_login(request)
+        elif type == "ldap":
+            return self._ldap_login(request)
         raise exc.BadRequest(_("invalid login type"))

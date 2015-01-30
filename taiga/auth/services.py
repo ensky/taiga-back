@@ -209,6 +209,30 @@ def github_register(username:str, email:str, full_name:str, github_id:int, bio:s
 
     return user
 
+@tx.atomic
+def ldap_register(username:str, email: str, full_name: str):
+    """
+    Register a new user from LDAP.
+
+    This can raise `exc.IntegrityError` exceptions in
+    case of conflict found.
+
+    :returns: User
+    """
+    user_model = apps.get_model("users", "User")
+
+    try:
+        # LDAP user association exist?
+        user = user_model.objects.get(username=username)
+    except user_model.DoesNotExist:
+        # Create a new user
+        username_unique = slugify_uniquely(username, user_model, slugfield="username")
+        user = user_model.objects.create(email=email,
+                                         username=username_unique,
+                                         full_name=full_name)
+        user_registered_signal.send(sender=user.__class__, user=user)
+
+    return user
 
 def make_auth_response_data(user) -> dict:
     """
