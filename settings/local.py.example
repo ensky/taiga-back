@@ -63,7 +63,7 @@ from .development import *
 #GITHUB_API_CLIENT_SECRET = "yourgithubclientsecret"
 
 # LDAP SETTINGS
-#LDAP_SERVER = "ldap://ldap.example.com/"
+#LDAP_SERVER = "ldap://ldap.example.com"
 #LDAP_DN_FORMAT = "uid={username},cn=users,dc=example,dc=com"
 #LDAP_BASE_EMAIL = "@example.com"
 
