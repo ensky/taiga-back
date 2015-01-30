@@ -20,16 +20,19 @@ from ldap3 import Server, Connection, AUTH_SIMPLE, STRATEGY_SYNC
 from django.conf import settings
 from . import exceptions as exc
 
+SERVER = getattr(settings, "LDAP_SERVER", "")
+DN_FORMAT = getattr(settings, "LDAP_DN_FORMAT", "")
+BASE_EMAIL = getattr(settings, "LDAP_BASE_EMAIL", "")
+
 def login (username: str, password: str) -> tuple:
-	server = getattr(settings, "LDAP_SERVER", None)
-	DN = getattr(settings, "LDAP_DN_FORMAT", None).format(username=username)
+	dn = DN_FORMAT.format(username=username)
 	try:
-		s = Server(server)
-		c = Connection(s, auto_bind = True, client_strategy = STRATEGY_SYNC, user=DN, password=password, authentication=AUTH_SIMPLE, check_names=True)
+		server = Server(SERVER)
+		conn = Connection(server, auto_bind = True, client_strategy = STRATEGY_SYNC, user=dn, password=password, authentication=AUTH_SIMPLE, check_names=True)
 	except:
 		raise exc.LDAPLoginError({"error_message": "LDAP account or password incorrect."})
 
-	email = username + getattr(settings, "LDAP_BASE_EMAIL", None).format(username=username)
+	email = username + BASE_EMAIL
 	full_name = username
 	return (email, full_name)
 
