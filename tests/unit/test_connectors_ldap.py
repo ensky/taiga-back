@@ -44,3 +44,4 @@ def test_ldap_login_fail():
 
     assert e.value.status_code == 400
     assert "error_message" in e.value.detail
+
